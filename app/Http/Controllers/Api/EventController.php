@@ -18,6 +18,8 @@ class EventController extends Controller
     public function __construct()
     {
         $this->middleware('auth:sanctum')->except(['index', 'show']);
+        $this->middleware('throttle:60,1')->only(['store', 'update' , 'destory']);
+
         $this->authorizeResource(Event::class, 'event');
     }
     /**
@@ -26,8 +28,8 @@ class EventController extends Controller
     public function index()
     {
         $query = $this->loadRelationships(Event::query());
-        
-       
+
+
         return EventResource::collection($query->latest()->paginate());
     }
 
@@ -72,7 +74,7 @@ class EventController extends Controller
     {
 
         $event->update(
-$request->validate([
+            $request->validate([
                 'name' => 'sometimes|string|max:255',
                 'description' => 'nullable|string',
                 'start_time' => 'sometimes|date',
